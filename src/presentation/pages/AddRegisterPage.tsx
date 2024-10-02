@@ -12,9 +12,9 @@ import { theme } from "@/src/core/constants/theme";
 
 const AddRegisterPage: React.FC = () => {
   const error = useDiaryStore((state) => state.error);
-  const response = useDiaryStore((state) => state.response);
-  const clearResponse = useDiaryStore((state) => state.clearResponse);
+  const success = useDiaryStore((state) => state.success);
   const clearError = useDiaryStore((state) => state.clearError);
+  const clearSuccess = useDiaryStore((state) => state.clearSuccess);
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -30,25 +30,26 @@ const AddRegisterPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (error) {
+    if (success) {
+      setSnackbarMessage("Registro añadido correctamente");
+      setSnackbarColor(primaryColor);
+      setSnackbarVisible(true);
+      clearSuccess();
+    } else if (error) {
       setSnackbarMessage(error);
       setSnackbarColor(errorColor);
       setSnackbarVisible(true);
-    } else if (response) {
-      setSnackbarMessage("Formulario enviado exitosamente");
-      setSnackbarColor(primaryColor);
-      setSnackbarVisible(true);
-      clearResponse();
+      clearError();
     }
-  }, [error, response]);
+  }, [success, error, clearSuccess, clearError]);
 
   // Limpia el estado al desmontar la pantalla
   useEffect(() => {
     return () => {
-      clearResponse();
+      clearSuccess();
       clearError();
     };
-  }, [clearResponse, clearError]);
+  }, [clearSuccess, clearError]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -61,11 +62,11 @@ const AddRegisterPage: React.FC = () => {
           action={{
             label: "Cerrar",
             onPress: () => setSnackbarVisible(false),
-            labelStyle: { color: "white" },
+            labelStyle: { color: "#0D0D0D" },
           }}
           style={[styles.snackbar, { backgroundColor: snackbarColor }]}
         >
-          <Text style={{ color: "white" }}>{snackbarMessage}</Text>
+          <Text style={{ color: "#0D0D0D" }}>{snackbarMessage}</Text>
         </Snackbar>
       </View>
     </TouchableWithoutFeedback>
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
   },
   snackbar: {
     position: "absolute",
-    bottom: 20,
+    bottom: 60,
   },
 });
 

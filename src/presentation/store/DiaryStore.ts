@@ -24,21 +24,25 @@ const deleteEntryUseCase = new DeleteEntry(diaryRepository);
 export const useDiaryStore = create<DiaryState & DiaryActions>((set) => ({
     loading: false,
     error: null,
+    success: false,
+    updateSuccess: false,
     response: null,
 
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
     setResponse: (response) => set({ response }),
+    setSuccess: (success) => set({ success }),
 
     createDiary: async (title, content) => {
-        set({ loading: true, error: null });
+        set({ loading: true, error: null, success: false });
         try {
             await createDiaryUseCase.execute(title, content);
-            set({ loading: false, response: 'Diary created successfully' });
+            set({ loading: false, error: null, success: true });
         } catch (error) {
             set({
                 loading: false,
-                error: error instanceof Error ? error.message : 'An error occurred'
+                error: error instanceof Error ? error.message : 'An error occurred',
+                success: false
             });
         }
     },
@@ -70,18 +74,19 @@ export const useDiaryStore = create<DiaryState & DiaryActions>((set) => ({
     },
 
     updateEntry: async (id, title, content) => {
-        set({ loading: true, error: null });
+        set({ loading: true, error: null, updateSuccess: false });
         try {
             const success: boolean = await updateEntryUseCase.execute(id, title, content);
             if (success) {
-                set({ loading: false, response: 'Diary updated successfully' });
+                set({ loading: false, updateSuccess: true });
             } else {
-                set({ loading: false, error: 'An error occurred' });
+                set({ loading: false, error: 'An error occurred', updateSuccess: false });
             }
         } catch (error) {
             set({
                 loading: false,
-                error: error instanceof Error ? error.message : 'An error occurred'
+                error: error instanceof Error ? error.message : 'An error occurred',
+                updateSuccess: false
             });
         }
     },
@@ -106,4 +111,5 @@ export const useDiaryStore = create<DiaryState & DiaryActions>((set) => ({
 
     clearResponse: () => set({ response: null }),
     clearError: () => set({ error: null }),
+    clearSuccess: () => set({ success: false }),
 }));

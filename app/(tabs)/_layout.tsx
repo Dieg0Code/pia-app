@@ -4,8 +4,6 @@ import { Tabs } from "expo-router";
 import {
   ChatIcon,
   DBIcon,
-  HomeIcon,
-  InfoIcon,
   QuestionIcon,
   RobotIcon,
 } from "../../src/presentation/components/Icons";
@@ -25,13 +23,14 @@ const TabsLayout = () => {
           headerTitleAlign: "center",
           headerTintColor: theme.title,
           tabBarStyle: {
-            backgroundColor: "#0D0D0D",
+            position: "absolute", // Para ponerlo sobre la pantalla
+            bottom: 10, // Ajusta la posición según tu diseño
+            left: 20,
+            right: 20,
             borderRadius: 20,
-            marginBottom: 20,
-            marginRight: 20,
-            marginLeft: 20,
-            width: "90%",
+            backgroundColor: "#0D0D0D",
             borderTopWidth: 0,
+            zIndex: 10, // Para asegurarse de que esté encima del contenido
           },
           tabBarActiveTintColor: theme.primary,
           tabBarShowLabel: false,
@@ -74,7 +73,7 @@ const TabsLayout = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.background, // Color de fondo del contenedor principal
+    backgroundColor: theme.background,
   },
 });
 
