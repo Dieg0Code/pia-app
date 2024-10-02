@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, ScrollView } from "react-native";
 import { TextInput, Button, Card } from "react-native-paper";
 import { useDiaryStore } from "../store/DiaryStore";
+import { theme } from "@/src/core/constants/theme";
 
 const DiaryForm: React.FC<{ onValidationError: (msg: string) => void }> = ({
   onValidationError,
@@ -31,23 +32,47 @@ const DiaryForm: React.FC<{ onValidationError: (msg: string) => void }> = ({
     <Card style={styles.card}>
       <Card.Content>
         <TextInput
-          label="Título"
+          label="¿Pregunta?..."
           value={title}
           onChangeText={setTitle}
           mode="outlined"
+          placeholderTextColor="#171717"
           style={styles.input}
+          outlineColor="#1F1F1F"
+          theme={{
+            colors: {
+              primary: theme.primary,
+            },
+            roundness: 16,
+          }}
         />
-        <TextInput
-          label="Contenido"
-          value={content}
-          onChangeText={setContent}
-          mode="outlined"
-          multiline
-          numberOfLines={4}
-          style={styles.input}
-        />
-        <Button mode="contained" onPress={handleSubmit} style={styles.button}>
-          Enviar Diario
+        <ScrollView>
+          <TextInput
+            label="Respuesta..."
+            value={content}
+            onChangeText={setContent}
+            mode="outlined"
+            multiline
+            numberOfLines={4}
+            placeholderTextColor="#1F1F1F"
+            outlineColor="#1F1F1F"
+            style={styles.input}
+            theme={{
+              colors: {
+                primary: theme.primary,
+              },
+              roundness: 16,
+            }}
+          />
+        </ScrollView>
+        <Button
+          mode="contained"
+          onPress={handleSubmit}
+          style={styles.button}
+          labelStyle={{ color: "black" }}
+          theme={{ colors: { primary: theme.primary } }}
+        >
+          Añadir
         </Button>
       </Card.Content>
     </Card>
@@ -60,10 +85,16 @@ const styles = StyleSheet.create({
   card: {
     width: Math.min(400, windowWidth - 60),
     maxWidth: "100%",
+    backgroundColor: theme.card,
   },
   input: {
     marginBottom: 16,
-    borderColor: "black",
+    borderColor: "#171717",
+    backgroundColor: theme.input,
+    maxHeight: 300,
+  },
+  scrollView: {
+    maxHeight: 200,
   },
   button: {
     marginTop: 16,
