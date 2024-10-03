@@ -13,15 +13,17 @@ import {
   Vibration,
 } from "react-native";
 import { Text, FAB, Snackbar } from "react-native-paper";
+import { FlashList } from "@shopify/flash-list";
 import { useDiaryStore } from "../store/DiaryStore";
-import DataCard from "../components/DataCard";
 import { DiaryDTO } from "@/src/data/models/DiaryDTO";
 import { theme } from "@/src/core/constants/theme";
-import { FlashList } from "@shopify/flash-list";
+import DataCard from "../components/DataCard";
 import EditRegistryModal from "../components/EditRegistryModal";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import SearchBar from "../components/SearchBar";
 
-const SCROLL_THRESHOLD = 1300;
+const SCROLL_THRESHOLD = 600;
+const PAGE_SIZE = 100;
 
 const HomePage = () => {
   const {
@@ -33,32 +35,29 @@ const HomePage = () => {
     updateSuccess,
     deleteEntry,
   } = useDiaryStore();
+
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
   const [entries, setEntries] = useState<DiaryDTO[]>([]);
   const [showScrollTopButton, setShowScrollTopButton] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingEntry, setEditingEntry] = useState<DiaryDTO | null>(null);
-
-  // Delete modal
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
-  // Snackbar
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarColor, setSnackbarColor] = useState("white");
+  const [snackbar, setSnackbar] = useState({
+    visible: false,
+    message: "",
+    color: "white",
+  });
 
   const listRef = useRef<FlashList<DiaryDTO>>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const pageSize = 10;
-
   const fetchEntries = useCallback(
-    async (pageNum: number, refresh: boolean = false) => {
-      await getEntries(pageNum, pageSize);
-      if (refresh) {
-        setRefreshing(false);
-      }
+    async (pageNum: number, refresh = false) => {
+      await getEntries(pageNum, PAGE_SIZE);
+      if (refresh) setRefreshing(false);
     },
     [getEntries]
   );
@@ -67,37 +66,31 @@ const HomePage = () => {
     fetchEntries(page);
   }, [fetchEntries, page]);
 
-  // Effect to handle response of getEntries
   useEffect(() => {
     if (response && Array.isArray(response)) {
       setEntries((prevEntries) => {
-        if (page === 1) {
-          return response;
-        } else {
-          const newEntries = response.filter(
-            (newEntry) =>
-              !prevEntries.some((prevEntry) => prevEntry.id === newEntry.id)
-          );
-          return [...prevEntries, ...newEntries];
-        }
+        if (page === 1) return response;
+        const newEntries = response.filter(
+          (newEntry) =>
+            !prevEntries.some((prevEntry) => prevEntry.id === newEntry.id)
+        );
+        return [...prevEntries, ...newEntries];
       });
     }
   }, [response, page]);
 
-  // Effect to handle Snackbar visibility
   useEffect(() => {
     if (updateSuccess) {
-      setSnackbarMessage("Registro actualizado correctamente");
-      setSnackbarColor(theme.primary);
-      setSnackbarVisible(true);
+      showSnackbar("Registro actualizado correctamente", theme.primary);
     } else if (error) {
-      setSnackbarMessage(error);
-      setSnackbarColor(theme.error);
-      setSnackbarVisible(true);
+      showSnackbar(error, theme.error);
     }
   }, [updateSuccess, error]);
 
-  // Handle refresh list
+  const showSnackbar = (message: string, color: string) => {
+    setSnackbar({ visible: true, message, color });
+  };
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setPage(1);
@@ -105,9 +98,7 @@ const HomePage = () => {
   }, [fetchEntries]);
 
   const loadMoreEntries = () => {
-    if (!loading) {
-      setPage((prevPage) => prevPage + 1);
-    }
+    if (!loading) setPage((prevPage) => prevPage + 1);
   };
 
   const handleLongPress = useCallback((entry: DiaryDTO) => {
@@ -119,9 +110,10 @@ const HomePage = () => {
   const handleUpdateEntry = useCallback(async () => {
     if (editingEntry) {
       if (!editingEntry.title.trim() || !editingEntry.content.trim()) {
-        setSnackbarMessage("El título y el contenido no pueden estar vacíos");
-        setSnackbarColor(theme.error);
-        setSnackbarVisible(true);
+        showSnackbar(
+          "El título y el contenido no pueden estar vacíos",
+          theme.error
+        );
       } else {
         await updateEntry(
           editingEntry.id,
@@ -139,28 +131,38 @@ const HomePage = () => {
     Vibration.vibrate(100);
     try {
       await deleteEntry(entryToDelete);
-      setSnackbarMessage("Registro eliminado correctamente");
-      setSnackbarColor(theme.warning);
-      setSnackbarVisible(true);
+      showSnackbar("Registro eliminado correctamente", theme.warning);
       onRefresh();
     } catch (error) {
-      setSnackbarMessage("Error al eliminar el registro");
-      setSnackbarColor(theme.error);
-      setSnackbarVisible(true);
+      showSnackbar("Error al eliminar el registro", theme.error);
     } finally {
       setEntryToDelete(null);
-      setIsModalVisible(false);
+      setIsDeleteModalVisible(false);
     }
   }, [entryToDelete, deleteEntry, onRefresh]);
 
-  const handleOpenModal = (id: string) => {
-    setEntryToDelete(id);
-    setIsModalVisible(true);
-  };
+  const filteredEntries = useMemo(() => {
+    return entries.filter(
+      (entry) =>
+        entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.content.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [entries, searchQuery]);
 
-  const handleCloseModal = () => {
-    setIsModalVisible(false);
-    setEntryToDelete(null);
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: false,
+      listener: (event: { nativeEvent: { contentOffset: { y: number } } }) => {
+        setShowScrollTopButton(
+          event.nativeEvent.contentOffset.y > SCROLL_THRESHOLD
+        );
+      },
+    }
+  );
+
+  const scrollToTop = () => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
 
   const renderItem = useCallback(
@@ -170,28 +172,14 @@ const HomePage = () => {
         title={item.title}
         content={item.content}
         onLongPress={() => handleLongPress(item)}
-        onDelete={() => handleOpenModal(item.id)}
+        onDelete={() => {
+          setEntryToDelete(item.id);
+          setIsDeleteModalVisible(true);
+        }}
       />
     ),
-    [handleLongPress, handleOpenModal]
+    [handleLongPress]
   );
-
-  const memoizedEntries = useMemo(() => entries, [entries]);
-
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    {
-      useNativeDriver: false,
-      listener: (event: { nativeEvent: { contentOffset: { y: number } } }) => {
-        const offsetY = event.nativeEvent.contentOffset.y;
-        setShowScrollTopButton(offsetY > SCROLL_THRESHOLD);
-      },
-    }
-  );
-
-  const scrollToTop = () => {
-    listRef.current?.scrollToOffset({ offset: 0, animated: true });
-  };
 
   if (error && !updateSuccess) {
     return <Text style={styles.infoText}>Error: {error}</Text>;
@@ -199,15 +187,13 @@ const HomePage = () => {
 
   return (
     <View style={styles.container}>
-      {memoizedEntries.length > 0 ? (
+      <SearchBar setSearchQuery={setSearchQuery} value={searchQuery} />
+      {filteredEntries.length > 0 ? (
         <>
           <FlashList
-            contentContainerStyle={{
-              paddingTop: 10,
-              paddingBottom: 140,
-            }}
+            contentContainerStyle={styles.listContainer}
             ref={listRef}
-            data={memoizedEntries}
+            data={filteredEntries}
             renderItem={renderItem}
             estimatedItemSize={100}
             keyExtractor={(item) => item.id.toString()}
@@ -239,7 +225,11 @@ const HomePage = () => {
           )}
         </>
       ) : (
-        <Text style={styles.infoText}>No data available</Text>
+        <Text style={styles.infoText}>
+          {searchQuery
+            ? "No se encontraron resultados"
+            : "No hay datos disponibles"}
+        </Text>
       )}
 
       <EditRegistryModal
@@ -259,23 +249,23 @@ const HomePage = () => {
         }
       />
       <ConfirmDeleteModal
-        visible={isModalVisible}
-        onDismiss={handleCloseModal}
+        visible={isDeleteModalVisible}
+        onDismiss={() => setIsDeleteModalVisible(false)}
         onConfirm={handleDeleteEntry}
       />
 
       <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => setSnackbarVisible(false)}
+        visible={snackbar.visible}
+        onDismiss={() => setSnackbar((prev) => ({ ...prev, visible: false }))}
         duration={3000}
         action={{
           label: "Cerrar",
-          onPress: () => setSnackbarVisible(false),
+          onPress: () => setSnackbar((prev) => ({ ...prev, visible: false })),
           labelStyle: { color: "#0D0D0D" },
         }}
-        style={[styles.snackbar, { backgroundColor: snackbarColor }]}
+        style={[styles.snackbar, { backgroundColor: snackbar.color }]}
       >
-        <Text style={{ color: "#0D0D0D" }}>{snackbarMessage}</Text>
+        <Text style={{ color: "#0D0D0D" }}>{snackbar.message}</Text>
       </Snackbar>
     </View>
   );
@@ -285,6 +275,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.background,
+  },
+  listContainer: {
+    paddingTop: 10,
+    paddingBottom: 140,
   },
   fab: {
     position: "absolute",

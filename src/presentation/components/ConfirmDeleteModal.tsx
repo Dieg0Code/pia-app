@@ -21,7 +21,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       contentContainerStyle={styles.modalContent}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Eliminar registro</Text>
+        <Text style={styles.title}>¿Eliminar registro?</Text>
         <Text style={{ color: theme.title }}>
           Esta acción no se puede deshacer.
         </Text>
