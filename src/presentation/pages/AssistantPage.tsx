@@ -4,38 +4,34 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
   FlatList,
-  KeyboardAvoidingView,
-  Platform,
   Vibration,
 } from "react-native";
 import { useDiaryStore } from "@/src/presentation/store/DiaryStore";
 import { theme } from "@/src/core/constants/theme";
-import { Icon, IconButton } from "react-native-paper";
+import { IconButton } from "react-native-paper";
+import { ChatMessage } from "@/src/data/models/ChatMessage";
+import { ChatHistory } from "@/src/data/models/ChatHistory";
 
 const AssistantPage = () => {
   const [inputText, setInputText] = useState("");
-  const {
-    getPIAResponse,
-    piaResponse,
-    loading,
-    error,
-    chatHistory,
-    clearChatHistory,
-  } = useDiaryStore();
-  const flatListRef = useRef<FlatList<any>>(null);
+  const [messageSent, setMessageSent] = useState(false);
+  const { getPIAResponse, piaResponse, error, chatHistory, clearChatHistory } =
+    useDiaryStore();
+  const flatListRef = useRef<FlatList<ChatMessage>>(null);
 
   useEffect(() => {
-    if (piaResponse) {
+    if (piaResponse || messageSent) {
       scrollToBottom();
     }
-  }, [piaResponse]);
+  }, [piaResponse, messageSent]);
 
   const handleSend = async () => {
     if (inputText.trim()) {
-      await getPIAResponse(inputText);
+      setMessageSent(true);
+      Vibration.vibrate(100);
       setInputText("");
+      await getPIAResponse(inputText);
     }
   };
 
@@ -51,12 +47,7 @@ const AssistantPage = () => {
     }
   };
 
-  type Message = {
-    role: string;
-    content: string;
-  };
-
-  const renderMessage = ({ item }: { item: Message }) => (
+  const renderMessage = ({ item }: { item: ChatMessage }) => (
     <View
       style={[
         styles.messageBubble,
@@ -81,7 +72,7 @@ const AssistantPage = () => {
       {error && <Text style={styles.errorText}>{error}</Text>}
       <View style={styles.inputContainer}>
         <IconButton
-          onLongPress={handleClearChat}
+          onPress={handleClearChat}
           icon="broom"
           iconColor={theme.textPrimary}
           style={styles.clearButton}
@@ -90,11 +81,12 @@ const AssistantPage = () => {
           style={styles.input}
           value={inputText}
           onChangeText={setInputText}
+          onFocus={scrollToBottom}
           placeholder="Escribe tu mensaje..."
           placeholderTextColor={theme.textPrimary}
         />
         <IconButton
-          icon="send"
+          icon="arrow-up"
           iconColor={theme.black}
           onPress={handleSend}
           style={styles.sendButton}
@@ -112,7 +104,7 @@ const styles = StyleSheet.create({
   },
   chatListContainer: {
     flex: 1,
-    marginBottom: 10,
+    marginBottom: 30,
   },
   chatContainer: {
     padding: 10,
@@ -136,7 +128,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "row",
-    paddingBottom: 10,
+    paddingBottom: 24,
   },
   input: {
     flex: 1,
@@ -144,13 +136,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    marginRight: 10,
     color: theme.textPrimary,
   },
   sendButton: {
     backgroundColor: theme.primary,
     borderRadius: 20,
-    width: 50,
+    justifyContent: "center",
+    width: 40,
+    height: 40,
+    marginLeft: 16,
+    marginRight: 16,
   },
   sendButtonText: {
     color: theme.background,
@@ -160,7 +155,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.input,
     borderRadius: 20,
     justifyContent: "center",
-    marginRight: 10,
+    marginRight: 16,
+    marginLeft: 16,
     width: 40,
     height: 40,
   },

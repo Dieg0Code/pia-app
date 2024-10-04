@@ -55,21 +55,24 @@ export const useDiaryStore = create<DiaryState & DiaryActions>((set, get) => ({
 
     getPIAResponse: async (query: string) => {
         set({ loading: true, error: null });
-        console.log(query);
         try {
             const currentHistory = get().chatHistory;
-            const semanticQuery: SemanticQueryWithChatHistory = new SemanticQueryWithChatHistory(query, currentHistory);
+            const userMessage = new ChatMessage('user', query);
+            set({
+                chatHistory: new ChatHistory([...currentHistory.messages, userMessage])
+            })
 
             const response = await getPIAResponseUseCase.execute(query, currentHistory);
             console.log(response);
+            const piaResponse = new ChatMessage('assistant', response);
 
             set({
                 loading: false,
                 piaResponse: response,
                 chatHistory: new ChatHistory([
                     ...currentHistory.messages,
-                    new ChatMessage('user', query),
-                    new ChatMessage('assistant', response)
+                    userMessage,
+                    piaResponse
                 ])
             });
         } catch (error) {

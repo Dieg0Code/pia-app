@@ -19,7 +19,7 @@ const TabsLayout = () => {
         initialRouteName="Home"
         screenOptions={{
           headerStyle: {
-            backgroundColor: "#0D0D0D",
+            backgroundColor: theme.background,
             borderBottomWidth: 0,
             elevation: 0,
           },

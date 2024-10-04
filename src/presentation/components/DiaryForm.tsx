@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   card: {
     width: Math.min(400, windowWidth - 60),
     maxWidth: "100%",
-    backgroundColor: theme.black,
+    backgroundColor: theme.card,
     marginTop: -60,
   },
   input: {

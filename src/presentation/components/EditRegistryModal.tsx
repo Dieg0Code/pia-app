@@ -76,7 +76,7 @@ const EditRegistryModal: React.FC<EditRegistryModalProps> = ({
         Update Entry
       </Button>
       <Button
-        mode="outlined"
+        mode="text"
         onPress={onClose}
         style={styles.button}
         theme={{ colors: { primary: theme.primary, outline: theme.primary } }}
@@ -91,7 +91,7 @@ export default EditRegistryModal;
 
 const styles = StyleSheet.create({
   modalContent: {
-    backgroundColor: "#0D0D0D",
+    backgroundColor: theme.input,
     padding: 20,
     margin: 20,
     borderRadius: 10,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 10,
     maxHeight: 260,
-    backgroundColor: theme.input,
+    backgroundColor: theme.card,
     borderColor: "#171717",
   },
   button: {

@@ -27,15 +27,15 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
         </Text>
         <View style={styles.buttonsContainer}>
           <Button
-            mode="contained"
+            mode="text"
             onPress={onConfirm}
             style={styles.confirmButton}
-            labelStyle={{ color: "#0D0D0D" }}
+            labelStyle={{ color: theme.error }}
           >
             Eliminar
           </Button>
           <Button
-            mode="outlined"
+            mode="text"
             onPress={onDismiss}
             style={styles.cancelButton}
             labelStyle={{ color: theme.title }}
@@ -71,10 +71,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
+    alignItems: "center",
   },
   confirmButton: {
-    backgroundColor: theme.error,
-    marginRight: 10,
+    backgroundColor: theme.black,
+    marginRight: 32,
   },
   cancelButton: {
     borderColor: "#0D0D0D",

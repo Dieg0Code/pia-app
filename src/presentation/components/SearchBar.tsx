@@ -28,7 +28,7 @@ export default SearchBar;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.black,
+    backgroundColor: theme.background,
   },
   searchBar: {
     margin: 10,

@@ -221,7 +221,7 @@ const HomePage = () => {
               style={styles.fab}
               icon="arrow-up"
               onPress={scrollToTop}
-              color={theme.primary}
+              color={theme.title}
             />
           )}
         </>
@@ -284,9 +284,10 @@ const styles = StyleSheet.create({
   fab: {
     position: "absolute",
     margin: 16,
-    right: 0,
+    alignSelf: "center",
     bottom: 60,
-    backgroundColor: "#0D0D0D",
+    borderRadius: 50,
+    backgroundColor: theme.textPrimary,
   },
   snackbar: {
     position: "absolute",
