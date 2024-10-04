@@ -1,9 +1,9 @@
 import axios from "axios";
+import { create } from "zustand";
 import { DiaryRemoteDataSourceImpl } from "../../data/datasource/DiaryRemoteDatasourceImpl"
 import { DiaryRepositoryImpl } from "../../domain/repositories/DiaryRepositoryImpl";
 import { CreateDiary } from "../../domain/usecases/CreateDiary";
 import { GetPIAResponse } from "../../domain/usecases/GetPIAResponse";
-import { create } from "zustand";
 import { DiaryState } from "./DiaryState";
 import { DiaryActions } from "./DiaryActions";
 import { SupabaseImpl } from "@/src/data/datasource/SupabaseImpl";
@@ -11,6 +11,10 @@ import { GetEntries } from "@/src/domain/usecases/GetEntries";
 import { DiaryDTO } from "@/src/data/models/DiaryDTO";
 import { UpdateEntry } from "@/src/domain/usecases/UpdateEntry";
 import { DeleteEntry } from "@/src/domain/usecases/DeleteEntry";
+import { ChatHistory } from "@/src/data/models/ChatHistory";
+import { ChatMessage } from "@/src/data/models/ChatMessage";
+import { SemanticQueryWithChatHistory } from "@/src/data/models/SemanticQueryWithChatHistory";
+import { Vibration } from "react-native";
 
 const supabaseClient = new SupabaseImpl();
 const diaryRemoteDataSource = new DiaryRemoteDataSourceImpl(axios.create());
@@ -21,12 +25,14 @@ const getEntriesUseCase = new GetEntries(diaryRepository);
 const updateEntryUseCase = new UpdateEntry(diaryRepository);
 const deleteEntryUseCase = new DeleteEntry(diaryRepository);
 
-export const useDiaryStore = create<DiaryState & DiaryActions>((set) => ({
+export const useDiaryStore = create<DiaryState & DiaryActions>((set, get) => ({
     loading: false,
     error: null,
     success: false,
     updateSuccess: false,
     response: null,
+    chatHistory: new ChatHistory([]),
+    piaResponse: null,
 
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
@@ -47,17 +53,41 @@ export const useDiaryStore = create<DiaryState & DiaryActions>((set) => ({
         }
     },
 
-    getPIAResponse: async (query) => {
+    getPIAResponse: async (query: string) => {
         set({ loading: true, error: null });
+        console.log(query);
         try {
-            const response = await getPIAResponseUseCase.execute(query);
-            set({ loading: false, response });
+            const currentHistory = get().chatHistory;
+            const semanticQuery: SemanticQueryWithChatHistory = new SemanticQueryWithChatHistory(query, currentHistory);
+
+            const response = await getPIAResponseUseCase.execute(query, currentHistory);
+            console.log(response);
+
+            set({
+                loading: false,
+                piaResponse: response,
+                chatHistory: new ChatHistory([
+                    ...currentHistory.messages,
+                    new ChatMessage('user', query),
+                    new ChatMessage('assistant', response)
+                ])
+            });
         } catch (error) {
             set({
                 loading: false,
-                error: error instanceof Error ? error.message : 'An error occurred'
+                error: error instanceof Error ? error.message : 'An error occurred',
+                piaResponse: null
             });
         }
+    },
+
+    addMessageToChatHistory: (role, content) => {
+        set(state => ({
+            chatHistory: new ChatHistory([
+                ...state.chatHistory.messages,
+                new ChatMessage(role, content)
+            ])
+        }));
     },
 
     getEntries: async (page, pageSize) => {
@@ -105,11 +135,13 @@ export const useDiaryStore = create<DiaryState & DiaryActions>((set) => ({
                 loading: false,
                 error: error instanceof Error ? error.message : 'An error occurred'
             });
-
         }
     },
 
     clearResponse: () => set({ response: null }),
     clearError: () => set({ error: null }),
     clearSuccess: () => set({ success: false }),
+    clearChatHistory: () => {
+        set({ chatHistory: new ChatHistory([]) });
+    },
 }));

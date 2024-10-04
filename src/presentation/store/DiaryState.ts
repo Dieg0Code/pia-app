@@ -1,3 +1,4 @@
+import { ChatHistory } from "@/src/data/models/ChatHistory";
 import { DiaryDTO } from "@/src/data/models/DiaryDTO";
 
 export interface DiaryState {
@@ -6,4 +7,6 @@ export interface DiaryState {
     success: boolean;
     updateSuccess: boolean;
     response: string | DiaryDTO[] | null;
+    chatHistory: ChatHistory;
+    piaResponse: string | null;
 }

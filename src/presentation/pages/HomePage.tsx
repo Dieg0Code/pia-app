@@ -11,9 +11,10 @@ import {
   RefreshControl,
   Animated,
   Vibration,
+  ScrollView,
 } from "react-native";
 import { Text, FAB, Snackbar } from "react-native-paper";
-import { FlashList } from "@shopify/flash-list";
+import { AnimatedFlashList, FlashList } from "@shopify/flash-list";
 import { useDiaryStore } from "../store/DiaryStore";
 import { DiaryDTO } from "@/src/data/models/DiaryDTO";
 import { theme } from "@/src/core/constants/theme";
@@ -152,7 +153,7 @@ const HomePage = () => {
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     {
-      useNativeDriver: false,
+      useNativeDriver: true,
       listener: (event: { nativeEvent: { contentOffset: { y: number } } }) => {
         setShowScrollTopButton(
           event.nativeEvent.contentOffset.y > SCROLL_THRESHOLD
@@ -190,7 +191,7 @@ const HomePage = () => {
       <SearchBar setSearchQuery={setSearchQuery} value={searchQuery} />
       {filteredEntries.length > 0 ? (
         <>
-          <FlashList
+          <AnimatedFlashList
             contentContainerStyle={styles.listContainer}
             ref={listRef}
             data={filteredEntries}
@@ -203,7 +204,7 @@ const HomePage = () => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={[theme.background]}
+                colors={[theme.black]}
                 progressBackgroundColor={theme.primary}
               />
             }

@@ -2,6 +2,22 @@ import { theme } from "@/src/core/constants/theme";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Card, Text, TouchableRipple, IconButton } from "react-native-paper";
+import Animated, {
+  Layout,
+  FadeIn,
+  FadeOut,
+  SlideInLeft,
+  SlideOutRight,
+  SlideOutUp,
+  SlideInDown,
+  ZoomIn,
+  ZoomOut,
+  LinearTransition,
+  ZoomInLeft,
+  ZoomOutRight,
+  ZoomInEasyUp,
+  ZoomOutEasyDown,
+} from "react-native-reanimated";
 
 interface DataCardProps {
   title: string;
@@ -13,26 +29,32 @@ interface DataCardProps {
 const DataCard: React.FC<DataCardProps> = React.memo(
   ({ title, content, onLongPress, onDelete }) => {
     return (
-      <Card style={styles.card}>
-        <TouchableRipple
-          onLongPress={onLongPress}
-          rippleColor="rgba(0, 0, 0, .32)"
-          style={styles.touchable}
-        >
-          <View>
-            <IconButton
-              icon="delete-forever"
-              size={20}
-              onPress={onDelete}
-              style={styles.deleteIcon}
-            />
-            <Card.Content>
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.content}>{content}</Text>
-            </Card.Content>
-          </View>
-        </TouchableRipple>
-      </Card>
+      <Animated.View
+        entering={ZoomInEasyUp}
+        exiting={ZoomOutEasyDown}
+        layout={LinearTransition}
+      >
+        <Card style={styles.card}>
+          <TouchableRipple
+            onLongPress={onLongPress}
+            rippleColor="rgba(0, 0, 0, .32)"
+            style={styles.touchable}
+          >
+            <View>
+              <IconButton
+                icon="delete-forever"
+                size={20}
+                onPress={onDelete}
+                style={styles.deleteIcon}
+              />
+              <Card.Content>
+                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.content}>{content}</Text>
+              </Card.Content>
+            </View>
+          </TouchableRipple>
+        </Card>
+      </Animated.View>
     );
   }
 );

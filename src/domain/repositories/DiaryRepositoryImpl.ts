@@ -3,6 +3,8 @@ import { DiaryRemoteDataSource } from '../../data/datasource/DiaryRemoteDatasour
 import { DiaryModel } from '../../data/models/Diary';
 import { DiaryRepository } from './DiaryRepository';
 import { Supabase } from '@/src/data/datasource/Supabase';
+import { ChatHistory } from '@/src/data/models/ChatHistory';
+import { SemanticQueryWithChatHistory } from '@/src/data/models/SemanticQueryWithChatHistory';
 
 export class DiaryRepositoryImpl implements DiaryRepository {
 
@@ -12,6 +14,11 @@ export class DiaryRepositoryImpl implements DiaryRepository {
     constructor(remoteDataSource: DiaryRemoteDataSource, supabase: Supabase) {
         this.remoteDataSource = remoteDataSource;
         this.supabase = supabase;
+    }
+
+    async getPIAResponse(query: string, chatHistory: ChatHistory): Promise<string> {
+        const queryWithChatHistory = new SemanticQueryWithChatHistory(query, chatHistory);
+        return await this.remoteDataSource.getPIAResponse(queryWithChatHistory);
     }
 
     async getEntries(page: number, pageSize: number): Promise<DiaryDTO[]> {
@@ -31,9 +38,4 @@ export class DiaryRepositoryImpl implements DiaryRepository {
         const diaryModel = new DiaryModel(title, content);
         await this.remoteDataSource.createEntry(diaryModel);
     }
-
-    async getPIAResponse(query: string): Promise<string> {
-        return await this.remoteDataSource.getPIAResponse(query);
-    }
-
 }
