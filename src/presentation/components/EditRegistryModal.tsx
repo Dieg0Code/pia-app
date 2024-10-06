@@ -67,10 +67,11 @@ const EditRegistryModal: React.FC<EditRegistryModalProps> = ({
         />
       </ScrollView>
       <Button
-        mode="contained"
+        mode="text"
+        icon="content-save-edit"
         onPress={handleUpdatePress}
         style={styles.button}
-        labelStyle={{ color: "black" }}
+        labelStyle={{ color: theme.primary }}
         theme={{ colors: { primary: theme.primary } }}
       >
         Update Entry
@@ -79,7 +80,8 @@ const EditRegistryModal: React.FC<EditRegistryModalProps> = ({
         mode="text"
         onPress={onClose}
         style={styles.button}
-        theme={{ colors: { primary: theme.primary, outline: theme.primary } }}
+        labelStyle={{ color: theme.title }}
+        theme={{ colors: { primary: theme.title } }}
       >
         Cancel
       </Button>

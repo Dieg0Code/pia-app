@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
 import { theme } from "@/src/core/constants/theme";
 import Markdown from "react-native-markdown-display";
@@ -33,7 +33,11 @@ const markdownStyles = StyleSheet.create({
     color: theme.title,
     fontWeight: "bold",
   },
-  text: {
+  heading2: {
+    color: theme.title,
+    fontWeight: "bold",
+  },
+  heading3: {
     color: theme.title,
   },
   link: {
@@ -41,17 +45,20 @@ const markdownStyles = StyleSheet.create({
   },
   strong: {
     fontWeight: "bold",
+    color: theme.title,
   },
   em: {
     fontStyle: "italic",
   },
   code_inline: {
-    backgroundColor: theme.card,
-    padding: 2,
-    borderRadius: 4,
+    backgroundColor: theme.input,
+    color: theme.textPrimary,
+    padding: 8,
+    borderRadius: 10,
   },
   code_block: {
-    backgroundColor: theme.card,
+    backgroundColor: theme.input,
+    color: theme.textPrimary,
     padding: 10,
     borderRadius: 4,
   },
@@ -65,9 +72,11 @@ const markdownStyles = StyleSheet.create({
   },
   ordered_list: {
     marginVertical: 5,
+    color: theme.title,
   },
   list_item: {
     marginVertical: 5,
+    color: theme.title,
   },
   hr: {
     marginVertical: 5,
@@ -89,5 +98,6 @@ const markdownStyles = StyleSheet.create({
   },
   paragraph: {
     marginVertical: 5,
+    color: theme.title,
   },
 });

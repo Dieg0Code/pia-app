@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,25 +6,47 @@ import {
   TextInput,
   FlatList,
   Vibration,
+  Keyboard,
 } from "react-native";
 import { useDiaryStore } from "@/src/presentation/store/DiaryStore";
 import { theme } from "@/src/core/constants/theme";
 import { IconButton } from "react-native-paper";
 import { ChatMessage } from "@/src/data/models/ChatMessage";
-import { ChatHistory } from "@/src/data/models/ChatHistory";
+import UserChatBubble from "../components/UserChatBubble";
+import PiaChatBubble from "../components/PiaChatBubble";
 
 const AssistantPage = () => {
   const [inputText, setInputText] = useState("");
   const [messageSent, setMessageSent] = useState(false);
-  const { getPIAResponse, piaResponse, error, chatHistory, clearChatHistory } =
-    useDiaryStore();
+  const {
+    getPIAResponse,
+    piaResponse,
+    error,
+    chatHistory,
+    clearChatHistory,
+    loading,
+  } = useDiaryStore();
   const flatListRef = useRef<FlatList<ChatMessage>>(null);
+  const [contentVerticalOffset, setContentVerticalOffset] = useState(0);
+
+  const scrollToBottom = useCallback(() => {
+    if (flatListRef.current && contentVerticalOffset > 0) {
+      flatListRef.current.scrollToOffset({
+        offset: contentVerticalOffset,
+        animated: true,
+      });
+    }
+  }, [contentVerticalOffset]);
 
   useEffect(() => {
     if (piaResponse || messageSent) {
-      scrollToBottom();
+      // Usar requestAnimationFrame para asegurar que el scroll ocurra en el próximo frame de renderizado
+      requestAnimationFrame(() => {
+        scrollToBottom();
+        Keyboard.dismiss();
+      });
     }
-  }, [piaResponse, messageSent]);
+  }, [piaResponse, messageSent, scrollToBottom]);
 
   const handleSend = async () => {
     if (inputText.trim()) {
@@ -41,22 +63,13 @@ const AssistantPage = () => {
     clearChatHistory();
   };
 
-  const scrollToBottom = () => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
-    }
+  const renderMessage = ({ item }: { item: ChatMessage }) => {
+    return item.role === "user" ? (
+      <UserChatBubble content={item.content} />
+    ) : (
+      <PiaChatBubble content={item.content} />
+    );
   };
-
-  const renderMessage = ({ item }: { item: ChatMessage }) => (
-    <View
-      style={[
-        styles.messageBubble,
-        item.role === "user" ? styles.userBubble : styles.assistantBubble,
-      ]}
-    >
-      <Text style={styles.messageText}>{item.content}</Text>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -67,6 +80,14 @@ const AssistantPage = () => {
           renderItem={renderMessage}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={styles.chatContainer}
+          onContentSizeChange={(width, height) => {
+            setContentVerticalOffset(height);
+          }}
+          onLayout={scrollToBottom}
+          onScroll={({ nativeEvent }) => {
+            setContentVerticalOffset(nativeEvent.contentSize.height);
+          }}
+          scrollEventThrottle={16}
         />
       </View>
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -81,12 +102,13 @@ const AssistantPage = () => {
           style={styles.input}
           value={inputText}
           onChangeText={setInputText}
-          onFocus={scrollToBottom}
+          onSubmitEditing={handleSend}
           placeholder="Escribe tu mensaje..."
           placeholderTextColor={theme.textPrimary}
         />
         <IconButton
           icon="arrow-up"
+          loading={loading}
           iconColor={theme.black}
           onPress={handleSend}
           style={styles.sendButton}

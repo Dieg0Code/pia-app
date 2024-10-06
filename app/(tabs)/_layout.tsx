@@ -2,16 +2,22 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { Tabs, useNavigation } from "expo-router";
 import {
+  AddIcon,
+  BrainIcon,
   ChatIcon,
   DBIcon,
   QuestionIcon,
   RobotIcon,
 } from "../../src/presentation/components/Icons";
 import { theme } from "@/src/core/constants/theme";
-import { Ionicons } from "@expo/vector-icons"; // Usaremos Ionicons para la flechita
+import { Ionicons } from "@expo/vector-icons";
+import {
+  ChatHistoryIcon,
+  PiaIcon,
+} from "../../src/presentation/components/Icons";
 
 const TabsLayout = () => {
-  const navigation = useNavigation(); // Hook para manejar la navegación
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -43,7 +49,7 @@ const TabsLayout = () => {
           name="Home"
           options={{
             title: "Registros",
-            tabBarIcon: ({ color }) => <DBIcon color={color} />,
+            tabBarIcon: ({ color }) => <BrainIcon color={color} />,
             headerShown: true,
           }}
         />
@@ -51,24 +57,23 @@ const TabsLayout = () => {
           name="AddRegister"
           options={{
             title: "Preguntas Frecuentes",
-            tabBarIcon: ({ color }) => <QuestionIcon color={color} />,
+            tabBarIcon: ({ color }) => <AddIcon color={color} />,
           }}
         />
         <Tabs.Screen
           name="UserMessages"
           options={{
             title: "Historial de mensajes",
-            tabBarIcon: ({ color }) => <ChatIcon color={color} />,
+            tabBarIcon: ({ color }) => <ChatHistoryIcon color={color} />,
           }}
         />
         <Tabs.Screen
           name="Assistant"
           options={{
             title: "PIA",
-            tabBarIcon: ({ color }) => <RobotIcon color={color} />,
+            tabBarIcon: ({ color }) => <PiaIcon color={color} />,
             tabBarStyle: { display: "none" },
             headerShown: true,
-            // Agregar la flechita para volver
             headerLeft: () => (
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Ionicons

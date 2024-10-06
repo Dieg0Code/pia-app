@@ -66,10 +66,11 @@ const DiaryForm: React.FC<{ onValidationError: (msg: string) => void }> = ({
           />
         </ScrollView>
         <Button
-          mode="contained"
+          mode="text"
           onPress={handleSubmit}
+          icon={"content-save"}
           style={styles.button}
-          labelStyle={{ color: "black" }}
+          labelStyle={{ color: theme.primary }}
           theme={{ colors: { primary: theme.primary } }}
         >
           Añadir
