@@ -5,6 +5,7 @@ import { DiaryRepository } from './DiaryRepository';
 import { Supabase } from '@/src/data/datasource/Supabase';
 import { ChatHistory } from '@/src/data/models/ChatHistory';
 import { SemanticQueryWithChatHistory } from '@/src/data/models/SemanticQueryWithChatHistory';
+import { UserMessageDTO } from '@/src/data/models/UserMessageDTO';
 
 export class DiaryRepositoryImpl implements DiaryRepository {
 
@@ -14,6 +15,14 @@ export class DiaryRepositoryImpl implements DiaryRepository {
     constructor(remoteDataSource: DiaryRemoteDataSource, supabase: Supabase) {
         this.remoteDataSource = remoteDataSource;
         this.supabase = supabase;
+    }
+
+    async getUserMessages(page: number, pageSize: number): Promise<UserMessageDTO[]> {
+        return await this.supabase.getUserMessages(page, pageSize);
+    }
+
+    async deleteUserMessage(id: string): Promise<boolean> {
+        return await this.supabase.deleteUserMessage(id);
     }
 
     async getPIAResponse(query: string, chatHistory: ChatHistory): Promise<string> {

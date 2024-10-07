@@ -17,11 +17,11 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-navigation/native": "^6.0.2",
-    "@shopify/flash-list": "^1.7.1",
+    "@shopify/flash-list": "1.6.4",
     "@supabase/supabase-js": "^2.45.4",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
-    "expo": "~51.0.28",
+    "expo": "~51.0.36",
     "expo-constants": "~16.0.2",
     "expo-font": "~12.0.9",
     "expo-linking": "~6.3.1",
@@ -42,7 +42,8 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
     "zustand": "^5.0.0-rc.2",
-    "expo-clipboard": "~6.0.3"
+    "expo-clipboard": "~6.0.3",
+    "expo-local-authentication": "~14.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -15,6 +15,9 @@ import { ChatHistory } from "@/src/data/models/ChatHistory";
 import { ChatMessage } from "@/src/data/models/ChatMessage";
 import { SemanticQueryWithChatHistory } from "@/src/data/models/SemanticQueryWithChatHistory";
 import { Vibration } from "react-native";
+import { UserMessageDTO } from "@/src/data/models/UserMessageDTO";
+import { GetUserMessages } from "@/src/domain/usecases/GetUserMessages";
+import { DeleteUserMessage } from "@/src/domain/usecases/DeleteUserMessage";
 
 const supabaseClient = new SupabaseImpl();
 const diaryRemoteDataSource = new DiaryRemoteDataSourceImpl(axios.create());
@@ -24,6 +27,8 @@ const getPIAResponseUseCase = new GetPIAResponse(diaryRepository);
 const getEntriesUseCase = new GetEntries(diaryRepository);
 const updateEntryUseCase = new UpdateEntry(diaryRepository);
 const deleteEntryUseCase = new DeleteEntry(diaryRepository);
+const getUserMessagesUseCase = new GetUserMessages(diaryRepository);
+const deleteUserMessageUseCase = new DeleteUserMessage(diaryRepository);
 
 export const useDiaryStore = create<DiaryState & DiaryActions>((set, get) => ({
     loading: false,
@@ -33,6 +38,8 @@ export const useDiaryStore = create<DiaryState & DiaryActions>((set, get) => ({
     response: null,
     chatHistory: new ChatHistory([]),
     piaResponse: null,
+    userMessages: [],
+    deleteMessageSuccess: false,
 
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
@@ -141,10 +148,42 @@ export const useDiaryStore = create<DiaryState & DiaryActions>((set, get) => ({
         }
     },
 
+    getUserMessages: async (page, pageSize) => {
+        set({ loading: true, error: null });
+        try {
+            const userMessages: UserMessageDTO[] = await getUserMessagesUseCase.execute(page, pageSize);
+            set({ loading: false, userMessages: userMessages.reverse() });
+        } catch (error) {
+            set({
+                loading: false,
+                error: error instanceof Error ? error.message : 'An error occurred'
+            });
+        }
+    },
+
+    deleteMessage: async (id) => {
+        set({ loading: true, error: null });
+        try {
+            const success: boolean = await deleteUserMessageUseCase.execute(id);
+            if (success) {
+                set({ loading: false, deleteMessageSuccess: true });
+            } else {
+                set({ loading: false, error: 'An error occurred', deleteMessageSuccess: false });
+            }
+        } catch (error) {
+            set({
+                loading: false,
+                error: error instanceof Error ? error.message : 'An error occurred',
+                deleteMessageSuccess: false
+            });
+        }
+    },
+
     clearResponse: () => set({ response: null }),
     clearError: () => set({ error: null }),
     clearSuccess: () => set({ success: false }),
     clearChatHistory: () => {
         set({ chatHistory: new ChatHistory([]) });
     },
+    clearDeleteMessageSuccess: () => set({ deleteMessageSuccess: false })
 }));

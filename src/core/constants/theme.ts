@@ -7,5 +7,6 @@ export const theme = {
     title: "#B0B0B0",
     warning: "#E0BE36",
     black: "#0D0D0D",
-    textPrimary: "#666"
+    textPrimary: "#666",
+    fab: "#333333",
 };

@@ -3,18 +3,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Card, Text, TouchableRipple, IconButton } from "react-native-paper";
 import Animated, {
-  Layout,
-  FadeIn,
-  FadeOut,
-  SlideInLeft,
-  SlideOutRight,
-  SlideOutUp,
-  SlideInDown,
-  ZoomIn,
-  ZoomOut,
   LinearTransition,
-  ZoomInLeft,
-  ZoomOutRight,
   ZoomInEasyUp,
   ZoomOutEasyDown,
 } from "react-native-reanimated";
@@ -73,6 +62,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingTop: 8,
     paddingLeft: 8,
+    color: theme.title,
   },
   content: {
     fontSize: 14,

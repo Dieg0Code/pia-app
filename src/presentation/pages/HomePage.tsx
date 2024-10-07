@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     bottom: 60,
     borderRadius: 50,
-    backgroundColor: theme.textPrimary,
+    backgroundColor: theme.fab,
   },
   snackbar: {
     position: "absolute",

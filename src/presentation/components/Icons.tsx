@@ -1,6 +1,10 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Foundation,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 
 export const CircleInfoIcon = (props: any) => (
   <FontAwesome6 name="circle-info" size={26} color="white" {...props} />
@@ -49,4 +53,8 @@ export const PiaIcon = (props: any) => (
 
 export const BrainIcon = (props: any) => (
   <FontAwesome6 name="brain" size={26} color="white" {...props} />
+);
+
+export const AlertIcon = (props: any) => (
+  <Foundation name="alert" size={26} color="white" {...props} />
 );
