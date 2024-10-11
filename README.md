@@ -40,4 +40,7 @@ La app cuenta con las siguientes funcionalidades:
   <img src="./img/pia-registros-eliminar.jpeg" alt="Eliminar registro" width="200" height="auto">
   <img src="./img/pia-registros-eliminado-confirm.jpeg" alt="Eliminar registro confirmación con snack bar" width="200" height="auto">
   <img src="./img/pia-nuevo-registro.jpeg" alt="Añadir nuevo registro" width="200" height="auto">
+  <img src="./img/pia-nuevo-registro-añadido.jpeg" alt="Añadir nuevo registro confirm" width="200" height="auto">
+  <img src="./img/pia-historial-mensajes.jpeg" alt="Historial de mensajes" width="200" height="auto">
+  <img src="./img/pia-chat.jpeg" alt="Chat" width="200" height="auto">
 </div>
