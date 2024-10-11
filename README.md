@@ -44,3 +44,11 @@ La app cuenta con las siguientes funcionalidades:
   <img src="./img/pia-historial-mensajes.jpeg" alt="Historial de mensajes" width="200" height="auto">
   <img src="./img/pia-chat.jpeg" alt="Chat" width="200" height="auto">
 </div>
+
+## Sobre PIA
+
+PIA (Personal Intelligent Assistant) es un sistema basado en inteligencia artificial potenciado con `RAG` (Retrieval Augmented Generation). La tecnología RAG permite añadir información adicional a la inteligencia artificial que de otra forma no tendría acceso, en este caso es información sobre mi. PIA es capaz de responder preguntas en lenguaje natural, realizar búsquedas semánticas en la base de datos y aprender de las interacciones con el usuario.
+
+El backend de PIA está desarrollado en `Golang`, puedes ver el código fuente en el siguiente [repositorio](https://github.com/Dieg0Code/portfolio_04_personal_intelligent_assistant).
+
+También puedes interactuar con PIA en mi [sitio web](https://dieg0code.site).
