@@ -27,7 +27,7 @@ npx expo start
 
 La app cuenta con las siguientes funcionalidades:
 
-- Autenticación con Biométrica.
+- Autenticación Biométrica.
 - CRUD de registros.
 - Búsqueda semántica.
 - Chatbot potenciado con RAG (Retrieval Augmented Generation).
